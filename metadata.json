@@ -1,0 +1,5 @@
+{
+  "name": "OptiPix",
+  "description": "A smart batch image compression tool that uses browser-side processing for speed.",
+  "requestFramePermissions": []
+}
