@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Upload,
   Settings,
@@ -16,7 +15,7 @@ import {
   Moon,
   Zap,
   TrendingUp,
-  Plus
+  Plus,
 } from 'lucide-react';
 
 export const Icons = {
@@ -36,5 +35,5 @@ export const Icons = {
   Moon,
   Zap,
   TrendingUp,
-  Plus
+  Plus,
 };
