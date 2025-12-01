@@ -24,7 +24,7 @@ const App: React.FC = () => {
   const [settings, setSettings] = useState<CompressionSettings>(DEFAULT_SETTINGS);
 
   // Theme State
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   // Apply theme to document
   useEffect(() => {
