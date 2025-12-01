@@ -15,23 +15,38 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Construct mailto link to send feedback via email client
-    const feedbackEmail = import.meta.env.VITE_FEEDBACK_EMAIL || 'your-email@example.com';
-    const subject = encodeURIComponent('OptiPix Feedback from ' + name);
-    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
-    const mailtoLink = `mailto:${feedbackEmail}?subject=${subject}&body=${body}`;
+    try {
+      // Send feedback via Web3Forms API
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: import.meta.env.VITE_WEB3FORMS_KEY,
+          name: name,
+          email: email,
+          message: message,
+          subject: `OptiPix Feedback from ${name}`,
+        }),
+      });
 
-    // Open email client
-    window.location.href = mailtoLink;
-
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setName('');
-      setEmail('');
-      setMessage('');
-      onClose();
-    }, 2000);
+      if (response.ok) {
+        setSubmitted(true);
+        setTimeout(() => {
+          setSubmitted(false);
+          setName('');
+          setEmail('');
+          setMessage('');
+          onClose();
+        }, 2000);
+      } else {
+        alert('Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error sending feedback:', error);
+      alert('Failed to send message. Please try again.');
+    }
   };
 
   if (!isOpen) return null;
