@@ -45,9 +45,10 @@ const DropZone: React.FC<DropZoneProps> = ({ onFilesSelected }) => {
         w-full h-64
         rounded-xl border-2 border-dashed
         transition-all duration-200 ease-out
-        ${isDragging
-          ? 'border-(--primary) bg-(--primary)/5'
-          : 'border-(--border) hover:border-(--primary)/50 hover:bg-(--bg-subtle)'
+        ${
+          isDragging
+            ? 'border-(--primary) bg-(--primary)/5'
+            : 'border-(--border) hover:border-(--primary)/50 hover:bg-(--bg-subtle)'
         }
       `}
     >
@@ -60,12 +61,14 @@ const DropZone: React.FC<DropZoneProps> = ({ onFilesSelected }) => {
         onChange={handleChange}
       />
 
-      <div className={`
+      <div
+        className={`
         mb-4 p-4 rounded-full 
         transition-transform duration-200
         ${isDragging ? 'scale-110 text-(--primary)' : 'text-(--text-muted) group-hover:text-(--primary)'}
         bg-(--bg-subtle)
-      `}>
+      `}
+      >
         <Icons.Upload className="w-8 h-8" />
       </div>
 
@@ -74,6 +77,9 @@ const DropZone: React.FC<DropZoneProps> = ({ onFilesSelected }) => {
       </h3>
       <p className="text-sm text-(--text-muted) max-w-xs text-center leading-relaxed">
         Supports JPG, PNG, WEBP, SVG, GIF, BMP.
+      </p>
+      <p className="text-xs text-(--error) font-semibold max-w-xs text-center mt-1">
+        This site never saves your images or data. All processing is done locally in your browser.
       </p>
     </div>
   );

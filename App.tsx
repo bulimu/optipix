@@ -3,12 +3,13 @@ import JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ProcessedFile, CompressionSettings, FileFormat, ProcessedResult } from './types';
+import { ProcessedFile, CompressionSettings, FileFormat } from './types';
 import DropZone from './components/DropZone';
 import FileList from './components/FileList';
 import SettingsPanel from './components/SettingsPanel';
 import PreviewModal from './components/PreviewModal';
 import { Icons } from './components/Icon';
+import Footer from './components/Footer';
 import { compressImage } from './services/compressionService';
 
 const DEFAULT_SETTINGS: CompressionSettings = {
@@ -37,7 +38,7 @@ const App: React.FC = () => {
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
   // Preview Modal State
@@ -50,14 +51,23 @@ const App: React.FC = () => {
     const fileArray = Array.from(fileList);
 
     // Validate file types
-    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/bmp', 'image/avif', 'image/svg+xml'];
+    const validTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'image/gif',
+      'image/bmp',
+      'image/avif',
+      'image/svg+xml',
+    ];
 
-    const validFiles = fileArray.filter(file => validTypes.includes(file.type));
-    const rejectedFiles = fileArray.filter(file => !validTypes.includes(file.type));
+    const validFiles = fileArray.filter((file) => validTypes.includes(file.type));
+    const rejectedFiles = fileArray.filter((file) => !validTypes.includes(file.type));
 
     if (rejectedFiles.length > 0) {
-
-      alert(`Skipped ${rejectedFiles.length} unsupported file(s). Only image files (JPG, PNG, WEBP, SVG, GIF, BMP, AVIF) are supported.`);
+      alert(
+        `Skipped ${rejectedFiles.length} unsupported file(s). Only image files (JPG, PNG, WEBP, SVG, GIF, BMP, AVIF) are supported.`
+      );
     }
 
     if (validFiles.length === 0) return;
@@ -68,7 +78,7 @@ const App: React.FC = () => {
       const previewUrl = URL.createObjectURL(file);
 
       // Get dimensions asynchronously
-      const dimensions = await new Promise<{ w: number, h: number }>((resolve) => {
+      const dimensions = await new Promise<{ w: number; h: number }>((resolve) => {
         const img = new Image();
         img.onload = () => resolve({ w: img.width, h: img.height });
         img.onerror = () => resolve({ w: 0, h: 0 }); // Fallback if not an image or error
@@ -107,33 +117,40 @@ const App: React.FC = () => {
 
   const handleProcess = async () => {
     if (settings.formats.length === 0) {
-      alert("Please select at least one output format.");
+      alert('Please select at least one output format.');
       return;
     }
 
     setIsProcessing(true);
 
-    const fileIds = files.filter(f => f.status === 'pending' || f.status === 'error').map(f => f.id);
+    const fileIds = files
+      .filter((f) => f.status === 'pending' || f.status === 'error')
+      .map((f) => f.id);
 
     for (const id of fileIds) {
-      setFiles(prev => prev.map(f => f.id === id ? { ...f, status: 'processing' } : f));
+      setFiles((prev) => prev.map((f) => (f.id === id ? { ...f, status: 'processing' } : f)));
 
       try {
-        const currentFile = files.find(f => f.id === id);
+        const currentFile = files.find((f) => f.id === id);
         if (!currentFile) continue;
 
         // Compression (returns array of results)
         const results = await compressImage(currentFile.originalFile, settings);
 
-        setFiles(prev => prev.map(f => f.id === id ? {
-          ...f,
-          status: 'done',
-          results,
-        } : f));
-
+        setFiles((prev) =>
+          prev.map((f) =>
+            f.id === id
+              ? {
+                  ...f,
+                  status: 'done',
+                  results,
+                }
+              : f
+          )
+        );
       } catch (error) {
-        console.error("Error processing file", id, error);
-        setFiles(prev => prev.map(f => f.id === id ? { ...f, status: 'error' } : f));
+        console.error('Error processing file', id, error);
+        setFiles((prev) => prev.map((f) => (f.id === id ? { ...f, status: 'error' } : f)));
       }
     }
 
@@ -142,19 +159,30 @@ const App: React.FC = () => {
 
   const handleDownloadAll = async () => {
     const zip = new JSZip();
-    const folder = zip.folder("optipix-compressed");
+    const folder = zip.folder('optipix-compressed');
 
     files.forEach((file) => {
       if (file.status === 'done' && file.results.length > 0) {
-        let baseName = file.originalFile.name.substring(0, file.originalFile.name.lastIndexOf('.'));
+        const baseName = file.originalFile.name.substring(
+          0,
+          file.originalFile.name.lastIndexOf('.')
+        );
 
-        file.results.forEach(result => {
+        file.results.forEach((result) => {
           let extension = '';
           switch (result.format) {
-            case FileFormat.JPEG: extension = '.jpg'; break;
-            case FileFormat.PNG: extension = '.png'; break;
-            case FileFormat.WEBP: extension = '.webp'; break;
-            case FileFormat.SVG: extension = '.svg'; break;
+            case FileFormat.JPEG:
+              extension = '.jpg';
+              break;
+            case FileFormat.PNG:
+              extension = '.png';
+              break;
+            case FileFormat.WEBP:
+              extension = '.webp';
+              break;
+            case FileFormat.SVG:
+              extension = '.svg';
+              break;
           }
 
           // Append extension if not present (safeguard)
@@ -164,14 +192,17 @@ const App: React.FC = () => {
       }
     });
 
-    const content = await zip.generateAsync({ type: "blob" });
+    const content = await zip.generateAsync({ type: 'blob' });
     // Robust saveAs usage
-    const saveAs = FileSaver.saveAs || (FileSaver as any).default || FileSaver;
-    saveAs(content, "optipix-images.zip");
+    const saveAs: typeof FileSaver.saveAs =
+      FileSaver.saveAs ||
+      (FileSaver as typeof FileSaver & { default?: typeof FileSaver.saveAs }).default ||
+      FileSaver.saveAs;
+    saveAs(content, 'optipix-images.zip');
   };
 
   const clearAll = () => {
-    files.forEach(f => URL.revokeObjectURL(f.previewUrl));
+    files.forEach((f) => URL.revokeObjectURL(f.previewUrl));
     setFiles([]);
   };
 
@@ -182,15 +213,14 @@ const App: React.FC = () => {
     return acc + fileTotal;
   }, 0);
 
-  const totalProcessed = files.filter(f => f.status === 'done').length;
+  const totalProcessed = files.filter((f) => f.status === 'done').length;
   // Note: Total saved might be negative if we generate multiple files or larger files (SVG)
   const totalSaved = totalOriginalSize - totalCompressedSize;
-  const isAllDone = files.length > 0 && files.every(f => f.status === 'done');
+  const isAllDone = files.length > 0 && files.every((f) => f.status === 'done');
 
   return (
     <div className="min-h-screen bg-(--bg-main) text-(--text-main) p-4 md:p-12 transition-colors duration-200">
       <div className="max-w-5xl mx-auto">
-
         {/* Header */}
         <header className="flex flex-col md:flex-row justify-between items-center mb-8 md:mb-12 gap-6 border-b border-(--border) pb-6 md:pb-8">
           <div className="flex items-center gap-4">
@@ -198,9 +228,7 @@ const App: React.FC = () => {
               <Icons.Zap className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">
-                OptiPix
-              </h1>
+              <h1 className="text-2xl font-bold tracking-tight">OptiPix</h1>
               <p className="text-sm text-(--text-muted)">Professional Image Compression</p>
             </div>
           </div>
@@ -211,15 +239,16 @@ const App: React.FC = () => {
               className="btn btn-secondary"
               title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
-              {theme === 'dark' ? <Icons.Sun className="w-4 h-4" /> : <Icons.Moon className="w-4 h-4" />}
+              {theme === 'dark' ? (
+                <Icons.Sun className="w-4 h-4" />
+              ) : (
+                <Icons.Moon className="w-4 h-4" />
+              )}
               <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
             </button>
 
             {files.length > 0 && (
-              <button
-                onClick={clearAll}
-                className="btn btn-danger"
-              >
+              <button onClick={clearAll} className="btn btn-danger">
                 <Icons.Trash className="w-4 h-4" />
                 Clear All
               </button>
@@ -229,10 +258,7 @@ const App: React.FC = () => {
 
         {/* Main Control Area */}
         <div className="mb-8">
-          <SettingsPanel
-            settings={settings}
-            setSettings={setSettings}
-          />
+          <SettingsPanel settings={settings} setSettings={setSettings} />
         </div>
 
         {/* Upload Area */}
@@ -240,20 +266,23 @@ const App: React.FC = () => {
           <DropZone onFilesSelected={handleFilesSelected} />
         ) : (
           <div className="space-y-8">
-
             {/* Action Bar */}
             <div className="flex flex-col md:flex-row md:items-center justify-between card p-4 gap-4 sticky top-4 z-20 shadow-sm">
               <div className="flex items-center gap-4 text-sm w-full md:w-auto px-2">
                 <span className="font-medium">{files.length} images</span>
                 {totalProcessed > 0 && (
-                  <span className={`px-2 py-1 rounded text-xs font-bold ${totalSaved > 0 ? 'bg-(--success) text-white' : 'bg-(--bg-subtle) text-(--text-muted)'}`}>
-                    {totalSaved > 0 ? `Saved ${(totalSaved / (1024 * 1024)).toFixed(1)} MB` : `+${Math.abs(totalSaved / (1024 * 1024)).toFixed(1)} MB`}
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-bold ${totalSaved > 0 ? 'bg-(--success) text-white' : 'bg-(--bg-subtle) text-(--text-muted)'}`}
+                  >
+                    {totalSaved > 0
+                      ? `Saved ${(totalSaved / (1024 * 1024)).toFixed(1)} MB`
+                      : `+${Math.abs(totalSaved / (1024 * 1024)).toFixed(1)} MB`}
                   </span>
                 )}
               </div>
 
               <div className="grid grid-cols-2 md:flex gap-3 w-full md:w-auto">
-                {files.some(f => f.status === 'pending') && (
+                {files.some((f) => f.status === 'pending') && (
                   <button
                     onClick={handleProcess}
                     disabled={isProcessing}
@@ -270,7 +299,6 @@ const App: React.FC = () => {
                     )}
                   </button>
                 )}
-
                 {isAllDone && (
                   <button
                     onClick={handleDownloadAll}
@@ -278,7 +306,8 @@ const App: React.FC = () => {
                   >
                     <Icons.Download className="w-4 h-4" /> Download All ZIP
                   </button>
-                )}                {!isAllDone && files.some(f => f.status === 'done') && !isProcessing && (
+                )}{' '}
+                {!isAllDone && files.some((f) => f.status === 'done') && !isProcessing && (
                   <button
                     onClick={handleDownloadAll}
                     className="col-span-2 md:col-span-auto btn btn-secondary"
@@ -286,7 +315,6 @@ const App: React.FC = () => {
                     <Icons.Download className="w-4 h-4" /> Download Done
                   </button>
                 )}
-
                 <button
                   onClick={() => document.getElementById('add-more-input')?.click()}
                   className="col-span-2 md:col-span-auto btn btn-secondary"
@@ -304,11 +332,7 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <FileList
-              files={files}
-              onRemove={removeFile}
-              onPreview={handlePreview}
-            />
+            <FileList files={files} onRemove={removeFile} onPreview={handlePreview} />
           </div>
         )}
       </div>
@@ -318,6 +342,8 @@ const App: React.FC = () => {
         file={previewState.file}
         onClose={() => setPreviewState({ ...previewState, isOpen: false })}
       />
+
+      <Footer />
     </div>
   );
 };
