@@ -35,7 +35,13 @@ export enum FileFormat {
 declare global {
   interface Window {
     UPNG: {
-      encode(imgs: ArrayBuffer[], w: number, h: number, cnum: number, forbid_plte?: number[]): ArrayBuffer;
+      encode(
+        imgs: ArrayBuffer[],
+        w: number,
+        h: number,
+        cnum: number,
+        forbid_plte?: number[]
+      ): ArrayBuffer;
     };
   }
 }

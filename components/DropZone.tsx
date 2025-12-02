@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Icons } from './Icon';
 
 interface DropZoneProps {
@@ -6,6 +7,7 @@ interface DropZoneProps {
 }
 
 const DropZone: React.FC<DropZoneProps> = ({ onFilesSelected }) => {
+  const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -72,14 +74,12 @@ const DropZone: React.FC<DropZoneProps> = ({ onFilesSelected }) => {
         <Icons.Upload className="w-8 h-8" />
       </div>
 
-      <h3 className="text-lg font-medium mb-2 text-(--text-main)">
-        {isDragging ? 'Drop images here' : 'Click or drop images here'}
-      </h3>
+      <h3 className="text-lg font-medium mb-2 text-(--text-main)">{t('dropzone')}</h3>
       <p className="text-sm text-(--text-muted) max-w-xs text-center leading-relaxed">
         Supports JPG, PNG, WEBP, SVG, GIF, BMP.
       </p>
       <p className="text-xs text-(--error) font-semibold max-w-xs text-center mt-1">
-        This site never saves your images or data. All processing is done locally in your browser.
+        {t('privacyNotice')}
       </p>
     </div>
   );

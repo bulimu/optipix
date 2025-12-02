@@ -16,6 +16,7 @@ import {
   Zap,
   TrendingUp,
   Plus,
+  ChevronDown,
 } from 'lucide-react';
 
 export const Icons = {
@@ -36,4 +37,5 @@ export const Icons = {
   Zap,
   TrendingUp,
   Plus,
+  ChevronDown,
 };

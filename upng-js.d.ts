@@ -6,7 +6,7 @@ declare module 'upng-js' {
     cnum: number,
     dels?: number[]
   ): ArrayBuffer;
-  
+
   export function decode(buffer: ArrayBuffer): {
     width: number;
     height: number;
@@ -14,8 +14,13 @@ declare module 'upng-js' {
     ctype: number;
     frames: ArrayBuffer[];
   };
-  
-  export function toRGBA8(img: any): Uint8Array;
+
+  export function toRGBA8(img: {
+    width: number;
+    height: number;
+    depth?: number;
+    frames?: ArrayBuffer[];
+  }): Uint8Array;
 }
 
 declare global {

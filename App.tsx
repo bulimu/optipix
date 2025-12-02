@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,6 +11,7 @@ import SettingsPanel from './components/SettingsPanel';
 import PreviewModal from './components/PreviewModal';
 import { Icons } from './components/Icon';
 import Footer from './components/Footer';
+import LanguageSwitcher from './components/LanguageSwitcher';
 import { compressImage } from './services/compressionService';
 
 const DEFAULT_SETTINGS: CompressionSettings = {
@@ -20,6 +22,7 @@ const DEFAULT_SETTINGS: CompressionSettings = {
 };
 
 const App: React.FC = () => {
+  const { t } = useTranslation();
   const [files, setFiles] = useState<ProcessedFile[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [settings, setSettings] = useState<CompressionSettings>(DEFAULT_SETTINGS);
@@ -228,12 +231,13 @@ const App: React.FC = () => {
               <Icons.Zap className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">OptiPix</h1>
-              <p className="text-sm text-(--text-muted)">Professional Image Compression</p>
+              <h1 className="text-2xl font-bold tracking-tight">{t('appName')}</h1>
+              <p className="text-sm text-(--text-muted)">{t('appSubtitle')}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
+            <LanguageSwitcher />
             <button
               onClick={toggleTheme}
               className="btn btn-secondary"
@@ -244,13 +248,13 @@ const App: React.FC = () => {
               ) : (
                 <Icons.Moon className="w-4 h-4" />
               )}
-              <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+              {/* <span>{theme === 'dark' ? t('light') : t('dark')}</span> */}
             </button>
 
             {files.length > 0 && (
               <button onClick={clearAll} className="btn btn-danger">
                 <Icons.Trash className="w-4 h-4" />
-                Clear All
+                {t('clearAll')}
               </button>
             )}
           </div>
@@ -269,13 +273,15 @@ const App: React.FC = () => {
             {/* Action Bar */}
             <div className="flex flex-col md:flex-row md:items-center justify-between card p-4 gap-4 sticky top-4 z-20 shadow-sm">
               <div className="flex items-center gap-4 text-sm w-full md:w-auto px-2">
-                <span className="font-medium">{files.length} images</span>
+                <span className="font-medium">
+                  {files.length} {t('images')}
+                </span>
                 {totalProcessed > 0 && (
                   <span
                     className={`px-2 py-1 rounded text-xs font-bold ${totalSaved > 0 ? 'bg-(--success) text-white' : 'bg-(--bg-subtle) text-(--text-muted)'}`}
                   >
                     {totalSaved > 0
-                      ? `Saved ${(totalSaved / (1024 * 1024)).toFixed(1)} MB`
+                      ? `${t('saved')} ${(totalSaved / (1024 * 1024)).toFixed(1)} MB`
                       : `+${Math.abs(totalSaved / (1024 * 1024)).toFixed(1)} MB`}
                   </span>
                 )}
@@ -290,11 +296,11 @@ const App: React.FC = () => {
                   >
                     {isProcessing ? (
                       <>
-                        <Icons.Loader className="w-4 h-4 animate-spin" /> Processing...
+                        <Icons.Loader className="w-4 h-4 animate-spin" /> {t('processing')}
                       </>
                     ) : (
                       <>
-                        <Icons.Zap className="w-4 h-4" /> Start Processing
+                        <Icons.Zap className="w-4 h-4" /> {t('startProcessing')}
                       </>
                     )}
                   </button>
@@ -304,7 +310,7 @@ const App: React.FC = () => {
                     onClick={handleDownloadAll}
                     className="col-span-2 md:col-span-auto btn btn-primary"
                   >
-                    <Icons.Download className="w-4 h-4" /> Download All ZIP
+                    <Icons.Download className="w-4 h-4" /> {t('downloadAllZip')}
                   </button>
                 )}{' '}
                 {!isAllDone && files.some((f) => f.status === 'done') && !isProcessing && (
@@ -312,7 +318,7 @@ const App: React.FC = () => {
                     onClick={handleDownloadAll}
                     className="col-span-2 md:col-span-auto btn btn-secondary"
                   >
-                    <Icons.Download className="w-4 h-4" /> Download Done
+                    <Icons.Download className="w-4 h-4" /> {t('downloadDone')}
                   </button>
                 )}
                 <button
@@ -327,7 +333,7 @@ const App: React.FC = () => {
                     className="hidden"
                     onChange={(e) => e.target.files && handleFilesSelected(e.target.files)}
                   />
-                  <Icons.Plus className="w-4 h-4" /> Add More
+                  <Icons.Plus className="w-4 h-4" /> {t('addMore')}
                 </button>
               </div>
             </div>

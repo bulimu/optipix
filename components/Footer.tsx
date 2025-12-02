@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Icons } from './Icon';
 import FeedbackModal from './FeedbackModal';
 
 const Footer: React.FC = () => {
+  const { t } = useTranslation();
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
   return (
@@ -19,11 +21,11 @@ const Footer: React.FC = () => {
             </div>
 
             <p className="text-sm text-(--text-muted) leading-relaxed">
-              Professional client-side image compression.
+              {t('privacyText')}
               <br />
               <span className="font-semibold text-(--success) flex items-center gap-1 mt-2">
                 <Icons.Check className="w-3 h-3" />
-                100% Privacy Focused
+                {t('privacyTitle')}
               </span>
             </p>
           </div>
@@ -31,20 +33,19 @@ const Footer: React.FC = () => {
           {/* Quick Links */}
           <div className="space-y-4">
             <h4 className="font-semibold text-sm uppercase tracking-wider text-(--text-main)">
-              Features
+              {t('featuresTitle')}
             </h4>
             <ul className="space-y-2 text-sm text-(--text-muted)">
-              <li>Batch Compression</li>
-              <li>Multi-format Support (WebP, PNG, JPG)</li>
-              <li>Offline Capable</li>
-              <li>No File Size Limits</li>
+              <li>{t('feature1')}</li>
+              <li>{t('feature2')}</li>
+              <li>{t('feature3')}</li>
             </ul>
           </div>
 
           {/* Contact / Feedback */}
           <div className="space-y-4">
             <h4 className="font-semibold text-sm uppercase tracking-wider text-(--text-main)">
-              Contact & Feedback
+              {t('contactTitle')}
             </h4>
             <p className="text-sm text-(--text-muted)">
               Have suggestions or found a bug? We'd love to hear from you.
@@ -54,7 +55,7 @@ const Footer: React.FC = () => {
               className="inline-flex items-center gap-2 text-sm font-medium text-(--primary) hover:underline"
             >
               <Icons.TrendingUp className="w-4 h-4" />
-              Send a message
+              {t('feedback')}
             </button>
           </div>
         </div>

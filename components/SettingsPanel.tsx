@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { CompressionSettings, FileFormat } from '../types';
 import { Icons } from './Icon';
 
@@ -8,6 +9,8 @@ interface SettingsPanelProps {
 }
 
 const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, setSettings }) => {
+  const { t } = useTranslation();
+
   const handleQualityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSettings((prev) => ({ ...prev, quality: parseFloat(e.target.value) }));
   };
@@ -33,14 +36,14 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, setSettings }) 
         <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-(--primary) text-(--bg-main)">
           <Icons.Settings className="w-4 h-4" />
         </div>
-        <h2 className="text-lg font-semibold">Compression Settings</h2>
+        <h2 className="text-lg font-semibold">{t('compressionSettings')}</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {/* Quality Slider */}
         <div className="space-y-3">
           <div className="flex justify-between text-sm">
-            <label className="font-medium">Quality</label>
+            <label className="font-medium">{t('quality')}</label>
             <span className="font-mono font-medium text-(--primary)">
               {Math.round(settings.quality * 100)}%
             </span>
@@ -55,14 +58,14 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, setSettings }) 
             className="w-full accent-(--primary)"
           />
           <div className="flex justify-between text-xs text-(--text-muted)">
-            <span>Smaller File</span>
-            <span>Better Quality</span>
+            <span>{t('smallerFile')}</span>
+            <span>{t('betterQuality')}</span>
           </div>
         </div>
 
         {/* Max Dimensions */}
         <div className="space-y-3">
-          <label className="text-sm font-medium">Max Dimensions</label>
+          <label className="text-sm font-medium">{t('maxDimensions')}</label>
           <div className="flex gap-2">
             <div className="relative w-full">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-medium "></span>
@@ -91,13 +94,13 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, setSettings }) 
 
         {/* Format Selection (Multi-select) */}
         <div className="space-y-3">
-          <label className="text-sm font-medium">Output Formats</label>
+          <label className="text-sm font-medium">{t('outputFormats')}</label>
           <div className="flex flex-wrap gap-2">
             {[
-              { label: 'JPG', value: FileFormat.JPEG },
-              { label: 'PNG', value: FileFormat.PNG },
-              { label: 'WEBP', value: FileFormat.WEBP },
-              { label: 'SVG', value: FileFormat.SVG },
+              { label: t('formatJPG'), value: FileFormat.JPEG },
+              { label: t('formatPNG'), value: FileFormat.PNG },
+              { label: t('formatWEBP'), value: FileFormat.WEBP },
+              { label: t('formatSVG'), value: FileFormat.SVG },
             ].map((fmt) => {
               const isSelected = settings.formats.includes(fmt.value);
               return (

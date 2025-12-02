@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Icons } from './Icon';
 
 interface FeedbackModalProps {
@@ -7,6 +8,7 @@ interface FeedbackModalProps {
 }
 
 const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
@@ -60,7 +62,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-(--border)">
-          <h3 className="text-lg font-semibold text-(--text-main)">Send a Message</h3>
+          <h3 className="text-lg font-semibold text-(--text-main)">{t('sendMessage')}</h3>
           <button onClick={onClose} className="btn btn-ghost p-2 rounded-lg">
             <Icons.Close className="w-5 h-5" />
           </button>
@@ -73,10 +75,8 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
               <div className="w-16 h-16 rounded-full bg-(--success)/10 flex items-center justify-center">
                 <Icons.Check className="w-8 h-8 text-(--success)" />
               </div>
-              <p className="text-lg font-medium text-(--success)">Thank you for your feedback!</p>
-              <p className="text-sm text-(--text-muted) text-center">
-                We'll review your message and get back to you soon.
-              </p>
+              <p className="text-lg font-medium text-(--success)">{t('thankYou')}</p>
+              <p className="text-sm text-(--text-muted) text-center">{t('reviewMessage')}</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-3">
@@ -85,7 +85,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
                   htmlFor="name"
                   className="block text-sm font-medium text-(--text-main) mb-1.5"
                 >
-                  Name
+                  {t('name')}
                 </label>
                 <input
                   type="text"
@@ -93,7 +93,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="input-field"
-                  placeholder="Your name"
+                  placeholder={t('yourName')}
                   required
                 />
               </div>
@@ -103,7 +103,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
                   htmlFor="email"
                   className="block text-sm font-medium text-(--text-main) mb-1.5"
                 >
-                  Email
+                  {t('email')}
                 </label>
                 <input
                   type="email"
@@ -111,7 +111,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="input-field"
-                  placeholder="your@email.com"
+                  placeholder={t('yourEmail')}
                   required
                 />
               </div>
@@ -121,25 +121,25 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
                   htmlFor="message"
                   className="block text-sm font-medium text-(--text-main) mb-1.5"
                 >
-                  Message
+                  {t('message')}
                 </label>
                 <textarea
                   id="message"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   className="input-field min-h-[100px] resize-none"
-                  placeholder="Share your feedback, suggestions, or report a bug..."
+                  placeholder={t('feedbackPlaceholder')}
                   required
                 />
               </div>
 
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={onClose} className="btn btn-secondary flex-1">
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button type="submit" className="btn btn-primary flex-1">
                   <Icons.TrendingUp className="w-4 h-4" />
-                  Send Message
+                  {t('send')}
                 </button>
               </div>
             </form>
