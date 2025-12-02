@@ -1,4 +1,5 @@
-import { CompressionSettings, FileFormat, ProcessedResult } from "../types";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { CompressionSettings, FileFormat, ProcessedResult } from '../types';
 import UPNG from 'upng-js';
 import pako from 'pako';
 
@@ -23,16 +24,13 @@ export const compressImage = async (
     reader.onerror = (e) => reject(e);
 
     img.onload = async () => {
-      const canvas = document.createElement("canvas");
+      const canvas = document.createElement('canvas');
       let width = img.width;
       let height = img.height;
 
       // Calculate new dimensions
       if (width > settings.maxWidth || height > settings.maxHeight) {
-        const ratio = Math.min(
-          settings.maxWidth / width,
-          settings.maxHeight / height
-        );
+        const ratio = Math.min(settings.maxWidth / width, settings.maxHeight / height);
         width *= ratio;
         height *= ratio;
       }
@@ -48,9 +46,9 @@ export const compressImage = async (
       canvas.width = width;
       canvas.height = height;
 
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext('2d');
       if (!ctx) {
-        reject(new Error("Could not get canvas context"));
+        reject(new Error('Could not get canvas context'));
         return;
       }
 
@@ -64,28 +62,28 @@ export const compressImage = async (
         return new Promise((resFormat) => {
           if (format === FileFormat.SVG) {
             // Generate SVG by embedding the image as base64 inside an SVG wrapper
-            const dataUrl = canvas.toDataURL("image/png");
+            const dataUrl = canvas.toDataURL('image/png');
             const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
   <image href="${dataUrl}" width="${width}" height="${height}" />
 </svg>`;
-            const blob = new Blob([svgString], { type: "image/svg+xml" });
+            const blob = new Blob([svgString], { type: 'image/svg+xml' });
             results.push({ format, blob, size: blob.size, width, height });
             resFormat();
           } else if (format === FileFormat.PNG && settings.quality < 1.0 && window.UPNG) {
             // Use UPNG.js for lossy compression (TinyPNG style) if quality < 1
             const imageData = ctx.getImageData(0, 0, width, height);
             const buffer = imageData.data.buffer;
-            
-            const cnum = 256; 
+
+            const cnum = 256;
 
             try {
               const pngBuffer = window.UPNG.encode([buffer], width, height, cnum);
               const blob = new Blob([pngBuffer], { type: FileFormat.PNG });
               results.push({ format, blob, size: blob.size, width, height });
             } catch (e) {
-              console.error("UPNG Compression failed:", e);
+              console.error('UPNG Compression failed:', e);
               canvas.toBlob((blob) => {
-                if(blob) results.push({ format, blob, size: blob.size, width, height });
+                if (blob) results.push({ format, blob, size: blob.size, width, height });
                 resFormat();
               }, FileFormat.PNG);
               return;
@@ -108,7 +106,7 @@ export const compressImage = async (
       };
 
       try {
-        await Promise.all(formats.map(f => processFormat(f)));
+        await Promise.all(formats.map((f) => processFormat(f)));
         resolve(results);
       } catch (err) {
         reject(err);
