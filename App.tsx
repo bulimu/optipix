@@ -248,15 +248,7 @@ const App: React.FC = () => {
               ) : (
                 <Icons.Moon className="w-4 h-4" />
               )}
-              {/* <span>{theme === 'dark' ? t('light') : t('dark')}</span> */}
             </button>
-
-            {files.length > 0 && (
-              <button onClick={clearAll} className="btn btn-danger">
-                <Icons.Trash className="w-4 h-4" />
-                {t('clearAll')}
-              </button>
-            )}
           </div>
         </header>
 
@@ -335,9 +327,12 @@ const App: React.FC = () => {
                   />
                   <Icons.Plus className="w-4 h-4" /> {t('addMore')}
                 </button>
+                <button onClick={clearAll} className="btn btn-danger">
+                  <Icons.Trash className="w-4 h-4" />
+                  {t('clearAll')}
+                </button>
               </div>
             </div>
-
             <FileList files={files} onRemove={removeFile} onPreview={handlePreview} />
           </div>
         )}
