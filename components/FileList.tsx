@@ -18,11 +18,16 @@ const formatSize = (bytes: number) => {
 
 const getFormatLabel = (mimeType: string) => {
   switch (mimeType) {
-    case FileFormat.JPEG: return 'JPG';
-    case FileFormat.PNG: return 'PNG';
-    case FileFormat.WEBP: return 'WEBP';
-    case FileFormat.SVG: return 'SVG';
-    default: return 'FILE';
+    case FileFormat.JPEG:
+      return 'JPG';
+    case FileFormat.PNG:
+      return 'PNG';
+    case FileFormat.WEBP:
+      return 'WEBP';
+    case FileFormat.SVG:
+      return 'SVG';
+    default:
+      return 'FILE';
   }
 };
 
@@ -52,11 +57,7 @@ const FileList: React.FC<FileListProps> = ({ files, onRemove, onPreview }) => {
             <div className="flex items-center gap-4 w-full md:w-[30%] min-w-0">
               {/* Thumbnail */}
               <div className="relative w-12 h-12 shrink-0 rounded overflow-hidden bg-(--bg-subtle) border border-(--border)">
-                <img
-                  src={file.previewUrl}
-                  alt="preview"
-                  className="w-full h-full object-cover"
-                />
+                <img src={file.previewUrl} alt="preview" className="w-full h-full object-cover" />
                 {isProcessing && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[1px]">
                     <Icons.Loader className="w-5 h-5 animate-spin text-white" />
@@ -66,7 +67,10 @@ const FileList: React.FC<FileListProps> = ({ files, onRemove, onPreview }) => {
 
               {/* File Info */}
               <div className="min-w-0 flex-1">
-                <div className="font-medium truncate text-(--text-main) text-sm" title={file.originalFile.name}>
+                <div
+                  className="font-medium truncate text-(--text-main) text-sm"
+                  title={file.originalFile.name}
+                >
                   {file.originalFile.name}
                 </div>
                 <div className="flex items-center gap-2 text-xs mt-0.5 text-(--text-muted)">
@@ -75,7 +79,9 @@ const FileList: React.FC<FileListProps> = ({ files, onRemove, onPreview }) => {
                   {file.originalWidth && file.originalHeight && (
                     <>
                       <span className="w-1 h-1 rounded-full bg-(--border)"></span>
-                      <span>{file.originalWidth}×{file.originalHeight}</span>
+                      <span>
+                        {file.originalWidth}×{file.originalHeight}
+                      </span>
                     </>
                   )}
                 </div>
@@ -100,7 +106,9 @@ const FileList: React.FC<FileListProps> = ({ files, onRemove, onPreview }) => {
                   <div className="flex flex-wrap items-center justify-start gap-4 w-full md:w-auto flex-1">
                     {/* Compressed Dimensions */}
                     <div className="flex flex-col items-start shrink-0 min-w-20">
-                      <span className="text-[10px] uppercase tracking-wide text-(--text-muted)">Output Size</span>
+                      <span className="text-[10px] uppercase tracking-wide text-(--text-muted)">
+                        Output Size
+                      </span>
                       <span className="text-sm font-mono font-medium text-(--text-main)">
                         {primaryResult.width} × {primaryResult.height}
                       </span>
@@ -122,8 +130,11 @@ const FileList: React.FC<FileListProps> = ({ files, onRemove, onPreview }) => {
                               "
                           >
                             <div className="flex flex-col items-start justify-center min-w-10">
-                              <span className={`text-xs font-bold leading-tight ${isSaving ? 'text-(--success)' : 'text-(--error)'}`}>
-                                {isSaving ? '' : '+'}{percent}%
+                              <span
+                                className={`text-xs font-bold leading-tight ${isSaving ? 'text-(--success)' : 'text-(--error)'}`}
+                              >
+                                {isSaving ? '' : '+'}
+                                {percent}%
                               </span>
                               <span className="text-[10px] font-mono leading-tight text-(--text-muted)">
                                 {formatSize(res.size)}

@@ -343,6 +343,7 @@ const App: React.FC = () => {
         onClose={() => setPreviewState({ ...previewState, isOpen: false })}
       />
 
+      <div className="mt-32" />
       <Footer />
     </div>
   );
