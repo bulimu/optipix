@@ -47,9 +47,9 @@ const Footer: React.FC = () => {
             <h4 className="font-semibold text-sm uppercase tracking-wider text-(--text-main)">
               {t('contactTitle')}
             </h4>
-            <p className="text-sm text-(--text-muted)">
+            {/* <p className="text-sm text-(--text-muted)">
               Have suggestions or found a bug? We'd love to hear from you.
-            </p>
+            </p> */}
             <button
               onClick={() => setIsFeedbackOpen(true)}
               className="inline-flex items-center gap-2 text-sm font-medium text-(--primary) hover:underline"
