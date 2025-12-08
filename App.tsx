@@ -225,10 +225,10 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-(--bg-main) text-(--text-main) p-4 md:p-12 transition-colors duration-200">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <header className="flex flex-col md:flex-row justify-between items-center mb-8 md:mb-12 gap-6 border-b border-(--border) pb-6 md:pb-8">
+        <header className="flex flex-col md:flex-row justify-between  mb-8 md:mb-12 gap-2 border-b border-(--border) pb-6 md:pb-8">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-lg bg-(--primary) flex items-center justify-center text-(--bg-main)">
-              <Icons.Zap className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-lg  flex items-center justify-center ">
+              <img src={Icons.logo} alt="OptiPix Logo" />
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight">{t('appName')}</h1>
@@ -236,11 +236,11 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <LanguageSwitcher />
             <button
               onClick={toggleTheme}
-              className="btn btn-secondary"
+              className="btn btn-secondary "
               title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
               {theme === 'dark' ? (

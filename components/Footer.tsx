@@ -14,8 +14,8 @@ const Footer: React.FC = () => {
           {/* Brand & Privacy */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-(--primary) flex items-center justify-center text-(--bg-main)">
-                <Icons.Zap className="w-4 h-4" />
+              <div className="w-8 h-8 rounded-lg  flex items-center justify-center ">
+                <img src={Icons.logo} alt="OptiPix Logo" />
               </div>
               <span className="text-lg font-bold">OptiPix</span>
             </div>
