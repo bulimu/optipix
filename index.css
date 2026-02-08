@@ -14,17 +14,17 @@
 }
 
 :root {
-  /* Light Mode - High Contrast & Clean */
-  --primary: #2563eb; /* Blue 600 */
-  --primary-hover: #1d4ed8; /* Blue 700 */
-  --bg-main: #f4f4f5; /* Zinc 100 */
-  --bg-card: #ffffff; /* White */
-  --bg-subtle: #e4e4e7; /* Zinc 200 */
-  --text-main: #09090b; /* Zinc 950 */
-  --text-muted: #71717a; /* Zinc 500 */
-  --border: #d4d4d8; /* Zinc 300 */
+  /* Light Mode  */
+  --primary: #8c7851; /* Warm Brown - Button */
+  --primary-hover: #716040; /* Darker Brown */
+  --bg-main: #f9f4ef; /* Warm Beige Background */
+  --bg-card: #fffffe; /* White Card */
+  --bg-subtle: #eaddcf; /* Light Peach */
+  --text-main: #020826; /* Deep Navy - Headline */
+  --text-muted: #716040; /* Brown - Paragraph */
+  --border: #eaddcf; /* Light Peach Border */
   --success: #10b981; /* Emerald 500 */
-  --error: #ef4444; /* Red 500 */
+  --error: #f25042; /* Coral Red */
 
   --radius-sm: 4px;
   --radius-md: 6px;
@@ -32,17 +32,17 @@
 }
 
 :root.dark {
-  /* Dark Mode - Softer Modern Gray (Not Pitch Black) */
-  --primary: #60a5fa; /* Blue 400 */
-  --primary-hover: #93c5fd; /* Blue 300 */
-  --bg-main: #1c1c1e; /* Dark Gray (Apple-like) */
-  --bg-card: #2c2c2e; /* Lighter Gray Card */
-  --bg-subtle: #3a3a3c; /* Interaction State */
-  --text-main: #f2f2f7; /* Off-white */
-  --text-muted: #aeaeb2; /* Light Gray */
-  --border: #48484a; /* Visible Border */
+  /* Dark Mode */
+  --primary: #8c7851; /* Warm Brown */
+  --primary-hover: #a08d66; /* Lighter Brown on hover */
+  --bg-main: #020826; /* Deep Navy Background */
+  --bg-card: #1a1f3a; /* Lighter Navy Card */
+  --bg-subtle: #2a2f4a; /* Medium Navy */
+  --text-main: #fffffe; /* White Text */
+  --text-muted: #eaddcf; /* Light Peach Muted */
+  --border: #3a3f5a; /* Navy Border */
   --success: #34c759; /* Green */
-  --error: #ff453a; /* Red */
+  --error: #f25042; /* Coral Red */
 }
 
 body {
