@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Icons } from './Icon';
 import FeedbackModal from './FeedbackModal';
@@ -63,12 +64,12 @@ const Footer: React.FC = () => {
         <div className="mt-12 pt-8 border-t border-(--border) flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-(--text-muted)">
           <p>&copy; {new Date().getFullYear()} OptiPix. All rights reserved.</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-(--text-main)">
-              Privacy Policy
-            </a>
-            <a href="#" className="hover:text-(--text-main)">
-              Terms of Service
-            </a>
+            <Link to="/privacy" className="hover:text-(--text-main) transition-colors">
+              {t('legal.privacyPolicyTitle')}
+            </Link>
+            <Link to="/terms" className="hover:text-(--text-main) transition-colors">
+              {t('legal.termsOfServiceTitle')}
+            </Link>
           </div>
         </div>
       </div>

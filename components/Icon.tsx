@@ -17,6 +17,7 @@ import {
   TrendingUp,
   Plus,
   ChevronDown,
+  ChevronLeft,
 } from 'lucide-react';
 
 import logo from '../assets/images/logo.png';
@@ -40,5 +41,6 @@ export const Icons = {
   TrendingUp,
   Plus,
   ChevronDown,
+  ChevronLeft,
   logo,
 };
