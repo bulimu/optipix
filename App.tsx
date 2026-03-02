@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
@@ -10,9 +10,11 @@ import FileList from './components/FileList';
 import SettingsPanel from './components/SettingsPanel';
 import PreviewModal from './components/PreviewModal';
 import { Icons } from './components/Icon';
-import Footer from './components/Footer';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import { compressImage } from './services/compressionService';
+
+// Lazy-load Footer: it is below the fold and should not block initial render
+const Footer = lazy(() => import('./components/Footer'));
 
 const DEFAULT_SETTINGS: CompressionSettings = {
   quality: 0.8,
@@ -27,16 +29,29 @@ const App: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [settings, setSettings] = useState<CompressionSettings>(DEFAULT_SETTINGS);
 
-  // Theme State
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  // Theme State — read from localStorage synchronously so the inline script
+  // in index.html and React agree on the initial theme without a re-render flash.
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    try {
+      return (localStorage.getItem('optipix-theme') as 'light' | 'dark') || 'light';
+    } catch {
+      // localStorage unavailable (e.g. private browsing)
+      return 'light';
+    }
+  });
 
-  // Apply theme to document
+  // Keep the DOM class and localStorage in sync with React state
   useEffect(() => {
     const root = window.document.documentElement;
     if (theme === 'dark') {
       root.classList.add('dark');
     } else {
       root.classList.remove('dark');
+    }
+    try {
+      localStorage.setItem('optipix-theme', theme);
+    } catch {
+      // localStorage unavailable
     }
   }, [theme]);
 
@@ -345,7 +360,10 @@ const App: React.FC = () => {
       />
 
       <div className="mt-32" />
-      <Footer />
+      {/* Suspense boundary: Footer is lazy-loaded after main content renders */}
+      <Suspense fallback={null}>
+        <Footer />
+      </Suspense>
     </div>
   );
 };

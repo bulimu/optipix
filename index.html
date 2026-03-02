@@ -34,14 +34,51 @@
       }
    </script>
 
+    <!-- Preload critical assets -->
+    <link rel="preload" href="/assets/images/logo.png" as="image" />
+
+    <!-- Non-blocking Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    </noscript>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/index.css">
+
+    <!-- Inline theme detection: runs before React mounts to avoid FOUC and re-render -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('optipix-theme');
+          if (t === 'dark') document.documentElement.classList.add('dark');
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!--
+        Static above-fold shell: visible immediately before React hydrates.
+        Gives the browser a real LCP element without waiting for JS.
+        React.createRoot().render() will replace this once the bundle loads.
+      -->
+      <div style="min-height:100vh;padding:1rem;background:var(--bg-main,#f9fafb);color:var(--text-main,#111827)">
+        <div style="max-width:64rem;margin:0 auto">
+          <header style="display:flex;align-items:center;gap:1rem;padding-bottom:2rem;margin-bottom:3rem;border-bottom:1px solid var(--border,#e5e7eb)">
+            <img src="/assets/images/logo.png" alt="OptiPix Logo"
+                 width="48" height="48" fetchpriority="high"
+                 style="border-radius:0.5rem" />
+            <div>
+              <h1 style="font-size:1.5rem;font-weight:700;letter-spacing:-0.025em;margin:0">OptiPix</h1>
+              <p style="font-size:0.875rem;color:var(--text-muted,#6b7280);margin:0">Professional Image Compression</p>
+            </div>
+          </header>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>
