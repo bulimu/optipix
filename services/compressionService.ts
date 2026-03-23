@@ -1,13 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { CompressionSettings, FileFormat, ProcessedResult } from '../types';
-import UPNG from 'upng-js';
-import pako from 'pako';
-
-// Make UPNG available globally for the compression logic
-if (typeof window !== 'undefined') {
-  (window as any).UPNG = UPNG;
-  (window as any).pako = pako;
-}
 
 export const compressImage = async (
   file: File,
@@ -58,51 +49,40 @@ export const compressImage = async (
       const results: ProcessedResult[] = [];
       const formats = settings.formats.length > 0 ? settings.formats : [FileFormat.JPEG];
 
-      const processFormat = (format: string): Promise<void> => {
-        return new Promise((resFormat) => {
-          if (format === FileFormat.SVG) {
-            // Generate SVG by embedding the image as base64 inside an SVG wrapper
-            const dataUrl = canvas.toDataURL('image/png');
-            const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+      // Async processFormat: supports dynamic import for upng-js
+      const processFormat = async (format: string): Promise<void> => {
+        if (format === FileFormat.SVG) {
+          // Generate SVG by embedding the image as base64 inside an SVG wrapper
+          const dataUrl = canvas.toDataURL('image/png');
+          const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
   <image href="${dataUrl}" width="${width}" height="${height}" />
 </svg>`;
-            const blob = new Blob([svgString], { type: 'image/svg+xml' });
-            results.push({ format, blob, size: blob.size, width, height });
-            resFormat();
-          } else if (format === FileFormat.PNG && settings.quality < 1.0 && window.UPNG) {
-            // Use UPNG.js for lossy compression (TinyPNG style) if quality < 1
+          const blob = new Blob([svgString], { type: 'image/svg+xml' });
+          results.push({ format, blob, size: blob.size, width, height });
+        } else if (format === FileFormat.PNG && settings.quality < 1.0) {
+          // Dynamically import upng-js (+ pako) only when PNG quantization is needed.
+          // This keeps pako out of the initial bundle — it becomes an async chunk
+          // fetched on demand, only when the user compresses a PNG at quality < 1.0.
+          try {
+            const UPNG = await import('upng-js').then((m) => m.default ?? m);
             const imageData = ctx.getImageData(0, 0, width, height);
-            const buffer = imageData.data.buffer;
-
-            const cnum = 256;
-
-            try {
-              const pngBuffer = window.UPNG.encode([buffer], width, height, cnum);
-              const blob = new Blob([pngBuffer], { type: FileFormat.PNG });
-              results.push({ format, blob, size: blob.size, width, height });
-            } catch (e) {
-              console.error('UPNG Compression failed:', e);
-              canvas.toBlob((blob) => {
-                if (blob) results.push({ format, blob, size: blob.size, width, height });
-                resFormat();
-              }, FileFormat.PNG);
-              return;
-            }
-            resFormat();
-          } else {
-            // Default browser compression (Canvas)
-            canvas.toBlob(
-              (blob) => {
-                if (blob) {
-                  results.push({ format, blob, size: blob.size, width, height });
-                }
-                resFormat();
-              },
-              format,
-              settings.quality
+            const pngBuffer = UPNG.encode([imageData.data.buffer], width, height, 256);
+            const blob = new Blob([pngBuffer], { type: FileFormat.PNG });
+            results.push({ format, blob, size: blob.size, width, height });
+          } catch {
+            // Fallback to browser native PNG if upng-js fails
+            const blob = await new Promise<Blob | null>((res) =>
+              canvas.toBlob(res, FileFormat.PNG)
             );
+            if (blob) results.push({ format, blob, size: blob.size, width, height });
           }
-        });
+        } else {
+          // Default browser compression (Canvas)
+          const blob = await new Promise<Blob | null>((res) =>
+            canvas.toBlob(res, format, settings.quality)
+          );
+          if (blob) results.push({ format, blob, size: blob.size, width, height });
+        }
       };
 
       try {

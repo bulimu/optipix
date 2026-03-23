@@ -1,6 +1,6 @@
 import React, { useState, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
-import JSZip from 'jszip';
+import { zipSync } from 'fflate';
 import * as FileSaver from 'file-saver';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -143,40 +143,49 @@ const HomePage: React.FC<HomePageProps> = ({ theme, toggleTheme }) => {
   };
 
   const handleDownloadAll = async () => {
-    const zip = new JSZip();
-    const folder = zip.folder('optipix-compressed');
+    // Collect all files to zip: { 'optipix-compressed/name.ext': Uint8Array }
+    const readBlobAsUint8Array = (blob: Blob): Promise<Uint8Array> =>
+      new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(new Uint8Array(reader.result as ArrayBuffer));
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(blob);
+      });
 
-    files.forEach((file) => {
-      if (file.status === 'done' && file.results.length > 0) {
-        const baseName = file.originalFile.name.substring(
-          0,
-          file.originalFile.name.lastIndexOf('.')
-        );
+    const entries: Record<string, Uint8Array> = {};
 
-        file.results.forEach((result) => {
-          let extension = '';
-          switch (result.format) {
-            case FileFormat.JPEG:
-              extension = '.jpg';
-              break;
-            case FileFormat.PNG:
-              extension = '.png';
-              break;
-            case FileFormat.WEBP:
-              extension = '.webp';
-              break;
-            case FileFormat.SVG:
-              extension = '.svg';
-              break;
-          }
+    await Promise.all(
+      files
+        .filter((file) => file.status === 'done' && file.results.length > 0)
+        .flatMap((file) => {
+          const baseName = file.originalFile.name.substring(
+            0,
+            file.originalFile.name.lastIndexOf('.')
+          );
+          return file.results.map(async (result) => {
+            let extension = '';
+            switch (result.format) {
+              case FileFormat.JPEG:
+                extension = '.jpg';
+                break;
+              case FileFormat.PNG:
+                extension = '.png';
+                break;
+              case FileFormat.WEBP:
+                extension = '.webp';
+                break;
+              case FileFormat.SVG:
+                extension = '.svg';
+                break;
+            }
+            const fileName = baseName.endsWith(extension) ? baseName : `${baseName}${extension}`;
+            entries[`optipix-compressed/${fileName}`] = await readBlobAsUint8Array(result.blob);
+          });
+        })
+    );
 
-          const fileName = baseName.endsWith(extension) ? baseName : `${baseName}${extension}`;
-          folder?.file(fileName, result.blob);
-        });
-      }
-    });
-
-    const content = await zip.generateAsync({ type: 'blob' });
+    const zipped = zipSync(entries);
+    const content = new Blob([zipped as Uint8Array<ArrayBuffer>], { type: 'application/zip' });
     const saveAs: typeof FileSaver.saveAs =
       FileSaver.saveAs ||
       (FileSaver as typeof FileSaver & { default?: typeof FileSaver.saveAs }).default ||
