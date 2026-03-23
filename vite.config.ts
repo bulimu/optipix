@@ -21,18 +21,14 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (!id.includes('node_modules')) return;
-          // IMPORTANT: check more-specific strings BEFORE less-specific ones.
-          // e.g. 'lucide-react/dist/...' contains 'react/' as a substring,
-          // so lucide-react MUST be checked before react-dom / react/.
-          if (id.includes('lucide-react')) return 'icons-vendor';
-          if (id.includes('react-router')) return 'router-vendor';
-          if (id.includes('react-dom') || id.includes('/react/')) return 'react-vendor';
+          // Dynamically loaded heavy dependencies are split out
           if (id.includes('fflate')) return 'compress-vendor';
-          // upng-js + pako: dynamically imported, but explicitly named so they don't
-          // pollute the general vendor chunk. Loaded on demand (PNG quality < 1.0 only).
           if (id.includes('upng-js') || id.includes('/pako/') || id.includes('\\pako\\'))
             return 'png-vendor';
           if (id.includes('i18next') || id.includes('react-i18next')) return 'i18n-vendor';
+
+          // Everything else (React, Lucide, Router) stays in default vendor chunk
+          // to prevent circular dependency / undefined exports errors like the 'Activity' bug.
           return 'vendor';
         },
       },
