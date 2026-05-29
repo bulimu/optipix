@@ -14,48 +14,55 @@
 }
 
 :root {
-  /* Light Mode  */
-  --primary: #8c7851; /* Warm Brown - Button */
-  --primary-hover: #716040; /* Darker Brown */
-  --bg-main: #f9f4ef; /* Warm Beige Background */
-  --bg-card: #fffffe; /* White Card */
-  --bg-subtle: #eaddcf; /* Light Peach */
-  --text-main: #020826; /* Deep Navy - Headline */
-  --text-muted: #716040; /* Brown - Paragraph */
-  --border: #eaddcf; /* Light Peach Border */
-  --success: #10b981; /* Emerald 500 */
-  --error: #f25042; /* Coral Red */
+  /* Verdant Zen Light Mode */
+  --primary: #8ba889; /* Primary */
+  --primary-hover: #4a654a; /* Darker primary */
+  --bg-main: #fafaf5; /* Background */
+  --bg-card: #ffffff; /* Surface lowest */
+  --bg-subtle: #f4f4ef; /* Surface container low */
+  --text-main: #1a1c19; /* On background */
+  --text-muted: #434841; /* On surface variant */
+  --border: #c3c8bf; /* Outline variant */
+  --success: #8ba889; /* Primary mapped to success */
+  --error: #ba1a1a; /* Error */
 
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
 }
 
 :root.dark {
-  /* Dark Mode */
-  --primary: #8c7851; /* Warm Brown */
-  --primary-hover: #a08d66; /* Lighter Brown on hover */
-  --bg-main: #020826; /* Deep Navy Background */
-  --bg-card: #1a1f3a; /* Lighter Navy Card */
-  --bg-subtle: #2a2f4a; /* Medium Navy */
-  --text-main: #fffffe; /* White Text */
-  --text-muted: #eaddcf; /* Light Peach Muted */
-  --border: #3a3f5a; /* Navy Border */
-  --success: #34c759; /* Green */
-  --error: #f25042; /* Coral Red */
+  /* Verdant Zen Dark Mode */
+  --primary: #b0ceae; /* Primary Inverse */
+  --primary-hover: #ccebc8; /* Primary Fixed */
+  --bg-main: #1a1c19; /* On Background (inverted) */
+  --bg-card: #2f312e; /* Inverse Surface */
+  --bg-subtle: #434841; /* On surface variant (inverted) */
+  --text-main: #fafaf5; /* Background (inverted) */
+  --text-muted: #c3c8bf; /* Outline variant (inverted) */
+  --border: #737971; /* Outline */
+  --success: #b0ceae;
+  --error: #ffdad6; /* Error Container */
 }
 
 body {
   background-color: var(--bg-main);
   color: var(--text-main);
   font-family:
-    'Inter',
+    'Plus Jakarta Sans',
     system-ui,
     -apple-system,
     sans-serif;
   transition:
     background-color 0.2s ease,
     color 0.2s ease;
+}
+
+h1,
+h2,
+h3,
+.font-heading {
+  font-family: 'Manrope', 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 /* Utility Classes for the new design system */
@@ -71,6 +78,7 @@ body {
   cursor: pointer;
   border: 1px solid transparent;
 }
+
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -80,6 +88,7 @@ body {
   background-color: var(--primary);
   color: white;
 }
+
 .btn-primary:hover:not(:disabled) {
   background-color: var(--primary-hover);
 }
@@ -89,6 +98,7 @@ body {
   border-color: var(--border);
   color: var(--text-main);
 }
+
 .btn-secondary:hover:not(:disabled) {
   background-color: var(--bg-subtle);
 }
@@ -98,6 +108,7 @@ body {
   border-color: var(--error);
   color: var(--error);
 }
+
 .btn-danger:hover:not(:disabled) {
   background-color: var(--error);
   color: white;
@@ -107,6 +118,7 @@ body {
   background-color: transparent;
   color: var(--text-muted);
 }
+
 .btn-ghost:hover:not(:disabled) {
   background-color: var(--bg-subtle);
   color: var(--text-main);
@@ -126,6 +138,7 @@ body {
   border-radius: var(--radius-md);
   width: 100%;
 }
+
 .input-field:focus {
   outline: 2px solid var(--primary);
   border-color: transparent;
@@ -151,7 +164,8 @@ body {
   border-radius: var(--radius-lg);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   width: 100%;
-  max-width: 64rem; /* max-w-4xl */
+  max-width: 64rem;
+  /* max-w-4xl */
   max-height: 90vh;
   display: flex;
   flex-direction: column;
@@ -163,6 +177,7 @@ body {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -173,6 +188,7 @@ body {
     transform: scale(0.95);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
@@ -184,13 +200,16 @@ body {
   width: 8px;
   height: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--bg-main);
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
