@@ -8,7 +8,14 @@
     "build": "vite build",
     "preview": "vite preview",
     "test:e2e": "playwright test",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write **/*.{js,jsx,ts,tsx,json,css,md,yml,yaml,html}",
+    "format:check": "prettier --check **/*.{js,jsx,ts,tsx,json,css,md,yml,yaml,html}",
+    "check": "npm run lint && npm run typecheck && npm run build",
+    "analyze": "vite build --mode analyze"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -34,7 +41,6 @@
     "react-i18next": "^16.3.5",
     "react-router-dom": "^7.13.1",
     "tailwindcss": "^4.1.17",
-    "upng-js": "^2.1.0",
     "uuid": "^13.0.0"
   },
   "devDependencies": {

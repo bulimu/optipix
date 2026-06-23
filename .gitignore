@@ -14,7 +14,6 @@ dist-ssr
 .DS_Store
 .env
 *.log
-package-lock.json
 
 # Editor directories and files
 .vscode/*

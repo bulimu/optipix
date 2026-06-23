@@ -30,20 +30,3 @@ export enum FileFormat {
   WEBP = 'image/webp',
   SVG = 'image/svg+xml',
 }
-
-// Declare global UPNG variable from CDN script
-declare global {
-  interface Window {
-    UPNG: {
-      encode(
-        imgs: ArrayBuffer[],
-        w: number,
-        h: number,
-        cnum: number,
-        forbid_plte?: number[]
-      ): ArrayBuffer;
-    };
-  }
-}
-
-export const UPNG = typeof window !== 'undefined' ? window.UPNG : null;
