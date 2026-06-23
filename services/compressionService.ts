@@ -1,107 +1,96 @@
+import imageCompression from 'browser-image-compression';
 import { CompressionSettings, FileFormat, ProcessedResult } from '../types';
+
+const getMaxWidthOrHeight = (settings: CompressionSettings) => {
+  const maxWidth = Math.max(1, settings.maxWidth || Number.POSITIVE_INFINITY);
+  const maxHeight = Math.max(1, settings.maxHeight || Number.POSITIVE_INFINITY);
+  return Math.min(maxWidth, maxHeight);
+};
+
+const getTargetSizeMB = (file: File, quality: number) => {
+  const originalSizeMB = file.size / 1024 / 1024;
+  return Math.max(0.01, originalSizeMB * quality);
+};
+
+const getImageDimensions = async (blob: Blob) => {
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.decoding = 'async';
+  img.src = url;
+
+  try {
+    await img.decode();
+    return {
+      width: img.naturalWidth || img.width,
+      height: img.naturalHeight || img.height,
+    };
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+};
+
+const toCompressedFile = async (file: File, settings: CompressionSettings, format: string) => {
+  return imageCompression(file, {
+    maxSizeMB: getTargetSizeMB(file, settings.quality),
+    maxWidthOrHeight: getMaxWidthOrHeight(settings),
+    useWebWorker: false,
+    fileType: format,
+    initialQuality: settings.quality,
+    preserveExif: true,
+  });
+};
+
+const makeResult = async (format: string, blob: Blob): Promise<ProcessedResult> => {
+  const dimensions = await getImageDimensions(blob);
+  return {
+    format,
+    blob,
+    size: blob.size,
+    width: dimensions.width,
+    height: dimensions.height,
+  };
+};
+
+const makeSvgResult = async (
+  file: File,
+  settings: CompressionSettings
+): Promise<ProcessedResult> => {
+  const pngFile = await toCompressedFile(file, settings, FileFormat.PNG);
+  const dataUrl = await imageCompression.getDataUrlFromFile(pngFile);
+  const dimensions = await getImageDimensions(pngFile);
+  const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${dimensions.width}" height="${dimensions.height}" viewBox="0 0 ${dimensions.width} ${dimensions.height}">
+  <image href="${dataUrl}" width="${dimensions.width}" height="${dimensions.height}" />
+</svg>`;
+  const blob = new Blob([svgString], { type: FileFormat.SVG });
+
+  return {
+    format: FileFormat.SVG,
+    blob,
+    size: blob.size,
+    width: dimensions.width,
+    height: dimensions.height,
+  };
+};
 
 export const compressImage = async (
   file: File,
   settings: CompressionSettings
 ): Promise<ProcessedResult[]> => {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const reader = new FileReader();
+  const formats = settings.formats.length > 0 ? settings.formats : [FileFormat.JPEG];
+  const results: ProcessedResult[] = [];
 
-    reader.onload = (e) => {
-      img.src = e.target?.result as string;
-    };
+  for (const format of formats) {
+    if (format === FileFormat.SVG) {
+      results.push(await makeSvgResult(file, settings));
+      continue;
+    }
 
-    reader.onerror = (e) => reject(e);
+    const compressedFile = await toCompressedFile(file, settings, format);
+    results.push(await makeResult(format, compressedFile));
+  }
 
-    img.onload = async () => {
-      const canvas = document.createElement('canvas');
-      let width = img.width;
-      let height = img.height;
-
-      // Calculate new dimensions
-      if (width > settings.maxWidth || height > settings.maxHeight) {
-        const ratio = Math.min(settings.maxWidth / width, settings.maxHeight / height);
-        width *= ratio;
-        height *= ratio;
-      }
-
-      // CRITICAL FIX: UPNG and Canvas pixel manipulation require Integer dimensions.
-      width = Math.floor(width);
-      height = Math.floor(height);
-
-      // Safety check to ensure dimensions are at least 1px
-      width = Math.max(1, width);
-      height = Math.max(1, height);
-
-      canvas.width = width;
-      canvas.height = height;
-
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        reject(new Error('Could not get canvas context'));
-        return;
-      }
-
-      // Draw image
-      ctx.drawImage(img, 0, 0, width, height);
-
-      const results: ProcessedResult[] = [];
-      const formats = settings.formats.length > 0 ? settings.formats : [FileFormat.JPEG];
-
-      // Async processFormat: supports dynamic import for upng-js
-      const processFormat = async (format: string): Promise<void> => {
-        if (format === FileFormat.SVG) {
-          // Generate SVG by embedding the image as base64 inside an SVG wrapper
-          const dataUrl = canvas.toDataURL('image/png');
-          const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-  <image href="${dataUrl}" width="${width}" height="${height}" />
-</svg>`;
-          const blob = new Blob([svgString], { type: 'image/svg+xml' });
-          results.push({ format, blob, size: blob.size, width, height });
-        } else if (format === FileFormat.PNG && settings.quality < 1.0) {
-          // Dynamically import upng-js (+ pako) only when PNG quantization is needed.
-          // This keeps pako out of the initial bundle — it becomes an async chunk
-          // fetched on demand, only when the user compresses a PNG at quality < 1.0.
-          try {
-            const UPNG = await import('upng-js').then((m) => m.default ?? m);
-            const imageData = ctx.getImageData(0, 0, width, height);
-            const pngBuffer = UPNG.encode([imageData.data.buffer], width, height, 256);
-            const blob = new Blob([pngBuffer], { type: FileFormat.PNG });
-            results.push({ format, blob, size: blob.size, width, height });
-          } catch {
-            // Fallback to browser native PNG if upng-js fails
-            const blob = await new Promise<Blob | null>((res) =>
-              canvas.toBlob(res, FileFormat.PNG)
-            );
-            if (blob) results.push({ format, blob, size: blob.size, width, height });
-          }
-        } else {
-          // Default browser compression (Canvas)
-          const blob = await new Promise<Blob | null>((res) =>
-            canvas.toBlob(res, format, settings.quality)
-          );
-          if (blob) results.push({ format, blob, size: blob.size, width, height });
-        }
-      };
-
-      try {
-        await Promise.all(formats.map((f) => processFormat(f)));
-        resolve(results);
-      } catch (err) {
-        reject(err);
-      }
-    };
-
-    reader.readAsDataURL(file);
-  });
+  return results;
 };
 
-export const fileToDataURL = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-};
+export const fileToDataURL = (file: File): Promise<string> =>
+  imageCompression.getDataUrlFromFile(file);

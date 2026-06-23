@@ -18,9 +18,10 @@ import {
   Plus,
   ChevronDown,
   ChevronLeft,
+  Globe,
 } from 'lucide-react';
 
-import logo from '../assets/images/logo.png';
+import logo from '../assets/images/logo.svg';
 
 export const Icons = {
   Upload,
@@ -43,4 +44,5 @@ export const Icons = {
   ChevronDown,
   ChevronLeft,
   logo,
+  Globe,
 };

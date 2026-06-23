@@ -1,0 +1,7 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="OptiPix logo">
+  <rect width="256" height="256" rx="56" fill="#FAFAF5"/>
+  <path d="M70 66C89 62 168 61 187 69C197 73 200 86 199 104C198 127 199 162 194 181C191 193 181 199 165 199C138 200 99 200 78 196C63 193 57 184 57 168C57 143 56 106 60 85C62 74 65 68 70 66Z" stroke="#4A654A" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M82 164C96 149 105 139 116 127C123 119 130 122 137 132C141 138 146 144 151 151C155 146 159 142 163 138C169 132 175 135 181 143C186 150 190 156 194 163" stroke="#4A654A" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M159 94C159 101.18 153.18 107 146 107C138.82 107 133 101.18 133 94C133 86.82 138.82 81 146 81C153.18 81 159 86.82 159 94Z" stroke="#8BA889" stroke-width="10"/>
+  <path d="M85 91C95 88 105 88 115 91" stroke="#8BA889" stroke-width="10" stroke-linecap="round"/>
+</svg>

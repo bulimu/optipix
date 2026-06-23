@@ -127,7 +127,7 @@ h3,
 .card {
   background-color: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
 }
 
 .input-field {
@@ -212,4 +212,14 @@ h3,
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
+}
+/* Hide native number input spinners; custom steppers are used where needed. */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
 }

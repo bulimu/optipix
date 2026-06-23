@@ -8,11 +8,22 @@ interface SettingsPanelProps {
   setSettings: React.Dispatch<React.SetStateAction<CompressionSettings>>;
 }
 
+const DIMENSION_STEP = 10;
+
 const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, setSettings }) => {
   const { t } = useTranslation();
 
   const handleQualityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSettings((prev) => ({ ...prev, quality: parseFloat(e.target.value) }));
+  };
+
+  const updateDimension = (key: 'maxWidth' | 'maxHeight', value: number) => {
+    const fallback = key === 'maxWidth' ? 1920 : 1080;
+    setSettings((prev) => ({ ...prev, [key]: Math.max(1, value || fallback) }));
+  };
+
+  const stepDimension = (key: 'maxWidth' | 'maxHeight', delta: number) => {
+    setSettings((prev) => ({ ...prev, [key]: Math.max(1, prev[key] + delta) }));
   };
 
   const toggleFormat = (format: string) => {
@@ -29,6 +40,43 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, setSettings }) 
       return { ...prev, formats: newFormats };
     });
   };
+
+  const renderDimensionInput = (label: string, key: 'maxWidth' | 'maxHeight') => (
+    <label className="min-w-0 flex-1">
+      <div className="relative">
+        <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 font-semibold uppercase text-(--text-muted)">
+          {label}
+        </span>
+        <input
+          type="number"
+          min="1"
+          step={DIMENSION_STEP}
+          value={settings[key]}
+          onChange={(e) => updateDimension(key, parseInt(e.target.value))}
+          className="w-full rounded-xs border border-(--border) bg-(--bg-card) py-2 pr-8 pl-8 text-sm text-(--text-main) focus:border-transparent focus:outline-2 focus:outline-(--primary)"
+        />
+
+        <div className="absolute top-1 right-1 bottom-1 flex w-5 flex-col overflow-hidden border border-(--border) bg-(--bg-subtle)">
+          <button
+            type="button"
+            onClick={() => stepDimension(key, DIMENSION_STEP)}
+            className="flex flex-1 items-center justify-center text-(--text-muted) hover:bg-(--border) hover:text-(--text-main)"
+            aria-label={`Increase ${label}`}
+          >
+            <Icons.ChevronDown className="h-3 w-3 rotate-180" />
+          </button>
+          <button
+            type="button"
+            onClick={() => stepDimension(key, -DIMENSION_STEP)}
+            className="flex flex-1 items-center justify-center border-t border-(--border) text-(--text-muted) hover:bg-(--border) hover:text-(--text-main)"
+            aria-label={`Decrease ${label}`}
+          >
+            <Icons.ChevronDown className="h-3 w-3" />
+          </button>
+        </div>
+      </div>
+    </label>
+  );
 
   return (
     <div className="card p-6 mb-8">
@@ -67,28 +115,8 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, setSettings }) 
         <div className="space-y-3">
           <label className="text-sm font-medium">{t('maxDimensions')}</label>
           <div className="flex gap-2">
-            <div className="relative w-full">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-medium "></span>
-              <input
-                type="number"
-                value={settings.maxWidth}
-                onChange={(e) =>
-                  setSettings((prev) => ({ ...prev, maxWidth: parseInt(e.target.value) || 1920 }))
-                }
-                className="input-field pl-8"
-              />
-            </div>
-            <div className="relative w-full">
-              {/* <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-medium text-(--text-muted)">H</span> */}
-              <input
-                type="number"
-                value={settings.maxHeight}
-                onChange={(e) =>
-                  setSettings((prev) => ({ ...prev, maxHeight: parseInt(e.target.value) || 1080 }))
-                }
-                className="input-field pl-8"
-              />
-            </div>
+            {renderDimensionInput('W', 'maxWidth')}
+            {renderDimensionInput('H', 'maxHeight')}
           </div>
         </div>
 

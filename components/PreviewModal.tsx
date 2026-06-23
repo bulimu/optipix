@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Icons } from './Icon';
 import { ProcessedFile } from '../types';
 
@@ -19,42 +19,41 @@ const formatSize = (bytes: number) => {
 const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, file }) => {
   const [activeTab, setActiveTab] = useState<string | number>('original');
   const [blobUrls, setBlobUrls] = useState<Map<number, string>>(new Map());
+  const blobUrlsRef = useRef<Map<number, string>>(new Map());
+
+  const revokeBlobUrls = () => {
+    blobUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    blobUrlsRef.current = new Map();
+  };
 
   useEffect(() => {
-    return () => {
-      blobUrls.forEach((url) => URL.revokeObjectURL(url));
-    };
+    return revokeBlobUrls;
   }, []);
 
   useEffect(() => {
-    if (isOpen && file) {
-      blobUrls.forEach((url) => URL.revokeObjectURL(url));
+    if (!isOpen || !file) return;
 
-      const newMap = new Map<number, string>();
-      file.results.forEach((res, idx) => {
-        newMap.set(idx, URL.createObjectURL(res.blob));
-      });
-      setBlobUrls(newMap);
+    revokeBlobUrls();
 
-      if (file.results.length > 0) {
-        setActiveTab(0);
-      } else {
-        setActiveTab('original');
-      }
-    }
+    const newMap = new Map<number, string>();
+    file.results.forEach((res, idx) => {
+      newMap.set(idx, URL.createObjectURL(res.blob));
+    });
+
+    blobUrlsRef.current = newMap;
+    setBlobUrls(newMap);
+    setActiveTab(file.results.length > 0 ? 0 : 'original');
   }, [isOpen, file]);
 
   if (!isOpen || !file) return null;
 
   const isOriginal = activeTab === 'original';
   const currentResult = typeof activeTab === 'number' ? file.results[activeTab] : null;
-
   const currentUrl = isOriginal
     ? file.previewUrl
     : typeof activeTab === 'number'
       ? blobUrls.get(activeTab) || ''
       : '';
-  // const currentSize = isOriginal ? file.originalSize : currentResult?.size || 0;
   const currentFormat = isOriginal
     ? 'Original'
     : currentResult?.format.split('/')[1].toUpperCase().replace('SVG+XML', 'SVG') || 'IMG';
@@ -62,8 +61,10 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, file }) =>
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
+      <div
+        className="modal-content h-[76vh] max-h-[76vh] max-w-3xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex flex-col border-b border-(--border) bg-(--bg-card)">
           <div className="flex items-center justify-between p-4">
             <div className="flex flex-col min-w-0">
@@ -79,7 +80,6 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, file }) =>
             </button>
           </div>
 
-          {/* Tabs */}
           <div className="flex items-center gap-2 px-4 pb-0 overflow-x-auto">
             <button
               onClick={() => setActiveTab('original')}
@@ -111,13 +111,13 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, file }) =>
             })}
           </div>
         </div>
-        {/* Info Bar */}
-        <div className="px-4 py-2 flex items-center justify-between text-xs bg-(--bg-subtle) border-b border-(--border)">
+
+        <div className="min-h-11 px-4 py-2 flex items-center justify-between gap-4 text-xs bg-(--bg-subtle) border-b border-(--border)">
           <div className="flex items-center gap-3">
             <span className="font-mono text-(--text-muted)">
               {isOriginal
-                ? `${file.originalWidth}×${file.originalHeight}`
-                : `${currentResult?.width}×${currentResult?.height}`}
+                ? `${file.originalWidth}x${file.originalHeight}`
+                : `${currentResult?.width}x${currentResult?.height}`}
             </span>
             {!isOriginal && currentResult && (
               <span
@@ -135,57 +135,46 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, file }) =>
               </span>
             )}
           </div>
-          <div className="text-(--text-muted)">
-            {isOriginal ? 'Source Image' : 'Compressed Output'}
+          <div className="flex h-7 items-center justify-end gap-3 text-(--text-muted)">
+            <span>{isOriginal ? 'Source Image' : 'Compressed Output'}</span>
+            {!isOriginal && currentResult && currentUrl && (
+              <button
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = currentUrl;
+
+                  let ext = currentResult.format.split('/')[1];
+                  if (currentResult.format.includes('svg')) ext = 'svg';
+                  else if (ext === 'jpeg') ext = 'jpg';
+
+                  const safeName = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
+                  link.download = `${safeName}.${ext}`;
+
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+                className="btn btn-primary h-7 px-2 py-1 text-xs"
+              >
+                <Icons.Download className="w-3.5 h-3.5" />
+                Download {currentFormat}
+              </button>
+            )}
           </div>
         </div>
-        {/* Content */}
-        <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-(--bg-subtle)">
-          <div
-            className="relative rounded-lg overflow-hidden shadow-sm border border-(--border) bg-(--bg-card)"
-            style={{
-              backgroundImage:
-                'linear-gradient(45deg, var(--border) 25%, transparent 25%), linear-gradient(-45deg, var(--border) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, var(--border) 75%), linear-gradient(-45deg, transparent 75%, var(--border) 75%)',
-              backgroundSize: '20px 20px',
-              backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px',
-            }}
-          >
+
+        <div className="flex-1 min-h-0 overflow-hidden p-3 flex items-center justify-center bg-(--bg-subtle)">
+          {currentUrl ? (
             <img
               src={currentUrl}
               alt="Preview"
-              className="relative z-10 block"
-              style={{ maxWidth: '100%', maxHeight: '60vh', objectFit: 'contain' }}
+              className="block h-auto w-auto max-h-full max-w-full object-contain"
             />
-          </div>
-        </div>{' '}
-        {/* Footer */}
-        <div className="p-4 flex justify-end gap-3 border-t border-(--border) bg-(--bg-card)">
-          <button onClick={onClose} className="btn btn-ghost">
-            Close
-          </button>
-
-          {!isOriginal && currentResult && (
-            <button
-              onClick={() => {
-                const link = document.createElement('a');
-                link.href = currentUrl;
-
-                let ext = currentResult.format.split('/')[1];
-                if (currentResult.format.includes('svg')) ext = 'svg';
-                else if (ext === 'jpeg') ext = 'jpg';
-
-                const safeName = fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
-                link.download = `${safeName}.${ext}`;
-
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-              }}
-              className="btn btn-primary"
-            >
-              <Icons.Download className="w-4 h-4" />
-              Download {currentFormat}
-            </button>
+          ) : (
+            <div className="flex items-center gap-2 text-sm font-medium text-(--text-muted)">
+              <Icons.Loader className="w-4 h-4 animate-spin" />
+              Loading preview...
+            </div>
           )}
         </div>
       </div>

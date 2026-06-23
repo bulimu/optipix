@@ -1,0 +1,6 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="OptiPix favicon">
+  <rect width="64" height="64" rx="14" fill="#FAFAF5"/>
+  <path d="M18 16C25 14 43 15 48 18C51 20 51 26 50 32C50 39 50 46 47 49C44 52 24 52 18 49C15 47 14 42 15 35C15 28 14 20 18 16Z" stroke="#4A654A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M21 43C25 38 29 34 32 30C35 27 38 34 41 38C43 36 44 34 46 33C48 36 49 39 50 42" stroke="#4A654A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="38" cy="24" r="4" stroke="#8BA889" stroke-width="4"/>
+</svg>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Icons } from '../components/Icon';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import ThemeToggle from '../components/ThemeToggle';
 
 interface LegalPageProps {
   type: 'privacy' | 'terms';
@@ -83,7 +84,7 @@ const LegalPage: React.FC<LegalPageProps> = ({ type, theme, toggleTheme }) => {
     <div className="min-h-screen bg-(--bg-main) text-(--text-main) p-4 md:p-12 transition-colors duration-200">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <header className="flex flex-col md:flex-row justify-between mb-8 md:mb-12 gap-2 border-b border-(--border) pb-6 md:pb-8">
+        <header className="flex flex-col md:flex-row justify-between mb-6 md:mb-8 gap-2 border-b border-(--border) pb-3 md:pb-4">
           <div className="flex items-center gap-4">
             <Link to="/" className="flex items-center gap-4 group">
               <div className="w-12 h-12 rounded-lg flex items-center justify-center">
@@ -95,19 +96,9 @@ const LegalPage: React.FC<LegalPageProps> = ({ type, theme, toggleTheme }) => {
             </Link>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
+            <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
             <LanguageSwitcher />
-            <button
-              onClick={toggleTheme}
-              className="btn btn-secondary"
-              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            >
-              {theme === 'dark' ? (
-                <Icons.Sun className="w-4 h-4" />
-              ) : (
-                <Icons.Moon className="w-4 h-4" />
-              )}
-            </button>
           </div>
         </header>
 
