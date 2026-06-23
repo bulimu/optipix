@@ -5,7 +5,7 @@ import prettier from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
 
 export default [
-  { ignores: ['dist'] },
+  { ignores: ['dist', 'playwright-report', 'test-results', 'stats.html'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

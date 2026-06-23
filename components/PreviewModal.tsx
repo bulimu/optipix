@@ -75,7 +75,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ isOpen, onClose, file }) =>
                 {fileName}
               </h3>
             </div>
-            <button onClick={onClose} className="btn btn-ghost p-2 rounded-lg">
+            <button onClick={onClose} className="btn btn-ghost p-2 rounded-lg" aria-label="Close">
               <Icons.Close className="w-5 h-5" />
             </button>
           </div>

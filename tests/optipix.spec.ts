@@ -46,18 +46,14 @@ test.describe('OptiPix Image Compression', () => {
   });
 
   test('language switcher changes language', async ({ page }) => {
-    const langSwitcher = page.getByRole('button', { name: 'en' }).first();
-    await langSwitcher.click();
-
-    // Click Chinese option
-    await page.getByRole('button', { name: 'zh' }).click();
+    const langSwitcher = page.getByLabel('Change language');
+    await langSwitcher.selectOption('zh');
 
     // Verify Chinese text appears
     await expect(page.getByText('专业图片压缩工具')).toBeVisible();
 
     // Switch back to English
-    await page.getByRole('button', { name: 'zh' }).first().click();
-    await page.getByRole('button', { name: 'en' }).click();
+    await langSwitcher.selectOption('en');
     await expect(page.getByText('Professional Image Compression')).toBeVisible();
   });
 
@@ -130,7 +126,7 @@ test.describe('OptiPix Image Compression', () => {
 
   test('changes max dimensions', async ({ page }) => {
     // Find dimension inputs
-    const dimensionInputs = page.locator('.input-field').filter({ hasText: '' });
+    const dimensionInputs = page.locator('input[type="number"]');
 
     // Change max width
     await dimensionInputs.first().fill('1024');

@@ -3,17 +3,20 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 
+const analyze = process.env.ANALYZE === 'true';
+
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    visualizer({
-      open: true,
-      gzipSize: true,
-      brotliSize: true,
-      filename: 'stats.html',
-      template: 'treemap',
-    }),
+    analyze &&
+      visualizer({
+        open: true,
+        gzipSize: true,
+        brotliSize: true,
+        filename: 'stats.html',
+        template: 'treemap',
+      }),
   ],
   build: {
     chunkSizeWarningLimit: 600,
